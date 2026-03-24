@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Interval Countdown Timer</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --card: #1c1c1c;
+    --work: #ff3c3c;
+    --rest: #00e5a0;
+    --accent: #ff8c00;
+    --text: #f0f0f0;
+    --muted: #666;
+    --border: #2a2a2a;
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 10px 14px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, var(--work), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .round-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+  .round-badge span {
+    color: var(--accent);
+    font-size: 18px;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    margin: 6px 14px 0;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 3px;
+  }
+  .tab {
+    flex: 1;
+    padding: 5px;
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .tab.active-work { background: var(--work); color: #fff; }
+  .tab.active-setup { background: var(--card); color: var(--text); }
+
+  /* ── MAIN CONTENT ── */
+  main { flex: 1; padding: 8px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── SETUP PANEL ── */
+  #setup-panel { display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── TIMER CARDS & SHARED GRID ── */
+  .cards-grid {
+    display: grid;
+    /* label | MIN stepper | colon | SEC stepper */
+    grid-template-columns: auto 1fr auto 1fr;
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+  }
+  /* tri-colour accent bar */
+  .cards-grid::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(to bottom,
+      var(--accent) 33.33%,
+      var(--work)   33.33% 66.66%,
+      var(--rest)   66.66%);
+    z-index: 1;
+  }
+
+  .card-row { display: contents; }
+
+  .card-divider {
+    grid-column: 1 / -1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Grid cells */
+  .cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 7px 5px 7px;
+  }
+  .cell-label {
+    align-items: flex-start;
+    padding-left: 14px;
+    justify-content: center;
+    min-width: 58px;
+  }
+  .cell-sep {
+    padding: 0 1px;
+    justify-content: flex-end;
+    padding-bottom: 9px;
+  }
+
+  .field-lbl {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    align-self: center;
+  }
+  .card-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    line-height: 1.1;
+  }
+  .card-sublbl {
+    font-size: 8px;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+  .intro-card .card-label { color: var(--accent); }
+  .work-card  .card-label { color: var(--work); }
+  .rest-card  .card-label { color: var(--rest); }
+
+  .time-sep {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--muted);
+    line-height: 1;
+  }
+
+  /* Horizontal [+] [num] [−] stepper */
+  .stepper {
+    display: flex;
+    align-items: stretch;
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    width: 100%;
+  }
+  .time-btn {
+    background: var(--bg);
+    border: none;
+    color: var(--text);
+    width: 26px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background .15s;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .time-btn:active { background: #2a2a2a; }
+  .time-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+    background: var(--surface);
+    border: none;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    padding: 5px 0;
+    outline: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .time-display::-webkit-inner-spin-button,
+  .time-display::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .time-display:focus { background: #222; box-shadow: inset 0 0 0 2px currentColor; }
+  .intro-card .time-display { color: var(--accent); }
+  .work-card  .time-display { color: var(--work); }
+  .rest-card  .time-display { color: var(--rest); }
+
+  /* ── ROUNDS ROW (own row, full width inside work card area) ── */
+  .rounds-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px 8px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--card);
+  }
+  .rounds-row-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--work);
+  }
+  .rounds-stepper {
+    display: flex;
+    align-items: stretch;
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .rounds-btn {
+    background: var(--bg);
+    color: var(--text);
+    border: none;
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rounds-btn:active { background: #2a2a2a; }
+  .rounds-input {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    width: 48px;
+    text-align: center;
+    background: var(--surface);
+    color: var(--accent);
+    border: none;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 4px 0;
+    outline: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .rounds-input::-webkit-inner-spin-button,
+  .rounds-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .rounds-input:focus { background: #222; }
+
+  /* Summary row */
+  .summary-row {
+    display: flex;
+    gap: 6px;
+  }
+  .summary-chip {
+    flex: 1;
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 7px 4px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .summary-chip .s-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0px;
+  }
+  .summary-chip .s-lbl {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .chip-intro .s-val { color: var(--accent); }
+  .chip-total .s-val { color: var(--text); }
+  .chip-work .s-val { color: var(--work); }
+  .chip-rest .s-val { color: var(--rest); }
+
+  /* START BUTTON */
+  .start-btn {
+    background: linear-gradient(135deg, var(--work), var(--accent));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    width: 100%;
+    transition: transform .15s, opacity .15s;
+    box-shadow: 0 4px 20px rgba(255,60,60,.3);
+  }
+  .start-btn:active { transform: scale(.97); opacity: .9; }
+
+  /* ── TIMER PANEL ── */
+  #timer-panel { display: none; flex-direction: column; align-items: center; gap: 0; }
+
+  .phase-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 6px;
+    margin-bottom: 8px;
+    transition: color .3s;
+  }
+
+  /* Ring */
+  .ring-wrap {
+    position: relative;
+    width: 260px; height: 260px;
+    margin: 4px 0 8px;
+  }
+  .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--surface); stroke-width: 14; }
+  .ring-progress {
+    fill: none;
+    stroke-width: 14;
+    stroke-linecap: round;
+    transition: stroke-dashoffset .5s linear, stroke .3s;
+  }
+  .ring-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .ring-time {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    letter-spacing: 2px;
+    line-height: 1;
+    transition: color .3s;
+  }
+  .ring-phase-mini {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Round progress dots */
+  .dots-wrap {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 300px;
+    margin-bottom: 12px;
+  }
+  .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background .3s, transform .2s;
+  }
+  .dot.done { background: var(--rest); transform: scale(1.1); }
+  .dot.active { background: var(--work); transform: scale(1.2); box-shadow: 0 0 8px var(--work); }
+
+  /* Next up */
+  .next-up {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .next-up span { color: var(--text); }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+  }
+  .ctrl-btn {
+    flex: 1;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .ctrl-btn:active { transform: scale(.97); }
+  .ctrl-btn.primary {
+    background: var(--work);
+    border-color: var(--work);
+    color: #fff;
+    flex: 2;
+  }
+  .ctrl-btn.rest-phase  { background: var(--rest);   border-color: var(--rest);   color: #0a0a0a; }
+  .ctrl-btn.intro-phase { background: var(--accent); border-color: var(--accent); color: #0a0a0a; }
+
+  /* Done screen */
+  #done-panel {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex: 1;
+    text-align: center;
+    padding: 20px;
+  }
+  .done-emoji { font-size: 64px; }
+  .done-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, var(--work), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .done-stats {
+    display: flex;
+    gap: 20px;
+  }
+  .done-stat { text-align: center; }
+  .done-stat .dv {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent);
+  }
+  .done-stat .dl {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* Flash overlay */
+  #flash {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .1s;
+    z-index: 999;
+  }
+
+  /* Pulse anim */
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.04); }
+  }
+  .ring-time.pulsing { animation: pulse .5s ease-in-out 3; }
+
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+
+
+
+<header>
+  <div class="logo">Interval Countdown Timer</div>
+  <div class="round-badge">ROUND <span id="hdr-round">0</span>/<span id="hdr-total">0</span></div>
+</header>
+
+<div class="tabs">
+  <div class="tab active-setup" id="tab-setup" onclick="showSetup()">⚙ SETUP</div>
+  <div class="tab" id="tab-timer" onclick="showTimer()">▶ TIMER</div>
+</div>
+
+<main>
+
+<!-- SETUP -->
+<div id="setup-panel">
+
+  <!-- ALL 3 TIMERS — shared grid for perfect column alignment, rounds on its own row -->
+  <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;">
+
+    <div class="cards-grid">
+      <!-- INTRO ROW -->
+      <div class="card-row intro-card">
+        <div class="cell cell-label">
+          <div class="card-label">⏱ INTRO</div>
+          <div class="card-sublbl">once only</div>
+        </div>
+        <div class="cell">
+          <div class="field-lbl">MIN</div>
+          <div class="stepper">
+            <button class="time-btn" onclick="adj('im',1)">+</button>
+            <input class="time-display" id="im-disp" type="number" min="0" max="59" value="0"
+              oninput="onInput('im',this)" onblur="onBlur('im',this)" onfocus="this.select()">
+            <button class="time-btn" onclick="adj('im',-1)">−</button>
+          </div>
+        </div>
+        <div class="cell cell-sep"><div class="time-sep">:</div></div>
+        <div class="cell">
+          <div class="field-lbl">SEC</div>
+          <div class="stepper">
+            <button class="time-btn" onclick="adj('is',5)">+</button>
+            <input class="time-display" id="is-disp" type="number" min="0" max="59" value="0"
+              oninput="onInput('is',this)" onblur="onBlur('is',this)" onfocus="this.select()">
+            <button class="time-btn" onclick="adj('is',-5)">−</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <!-- WORK ROW -->
+      <div class="card-row work-card">
+        <div class="cell cell-label">
+          <div class="card-label">🔥 WORK</div>
+        </div>
+        <div class="cell">
+          <div class="field-lbl">MIN</div>
+          <div class="stepper">
+            <button class="time-btn" onclick="adj('wm',1)">+</button>
+            <input class="time-display" id="wm-disp" type="number" min="0" max="59" value="0"
+              oninput="onInput('wm',this)" onblur="onBlur('wm',this)" onfocus="this.select()">
+            <button class="time-btn" onclick="adj('wm',-1)">−</button>
+          </div>
+        </div>
+        <div class="cell cell-sep"><div class="time-sep">:</div></div>
+        <div class="cell">
+          <div class="field-lbl">SEC</div>
+          <div class="stepper">
+            <button class="time-btn" onclick="adj('ws',5)">+</button>
+            <input class="time-display" id="ws-disp" type="number" min="0" max="59" value="0"
+              oninput="onInput('ws',this)" onblur="onBlur('ws',this)" onfocus="this.select()">
+            <button class="time-btn" onclick="adj('ws',-5)">−</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <!-- REST ROW -->
+      <div class="card-row rest-card">
+        <div class="cell cell-label">
+          <div class="card-label">💤 REST</div>
+        </div>
+        <div class="cell">
+          <div class="field-lbl">MIN</div>
+          <div class="stepper">
+            <button class="time-btn" onclick="adj('rm',1)">+</button>
+            <input class="time-display" id="rm-disp" type="number" min="0" max="59" value="0"
+              oninput="onInput('rm',this)" onblur="onBlur('rm',this)" onfocus="this.select()">
+            <button class="time-btn" onclick="adj('rm',-1)">−</button>
+          </div>
+        </div>
+        <div class="cell cell-sep"><div class="time-sep">:</div></div>
+        <div class="cell">
+          <div class="field-lbl">SEC</div>
+          <div class="stepper">
+            <button class="time-btn" onclick="adj('rs',5)">+</button>
+            <input class="time-display" id="rs-disp" type="number" min="0" max="59" value="0"
+              oninput="onInput('rs',this)" onblur="onBlur('rs',this)" onfocus="this.select()">
+            <button class="time-btn" onclick="adj('rs',-5)">−</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /cards-grid -->
+
+    <!-- ROUNDS ROW — full width, below the 3 time rows -->
+    <div class="rounds-row">
+      <div class="rounds-row-label">🔁 ROUNDS</div>
+      <div class="rounds-stepper">
+        <button class="rounds-btn" onclick="adjR(-1)">−</button>
+        <input class="rounds-input" id="rounds-disp" type="number" min="1" max="99" value="1"
+          oninput="onInputR(this)" onblur="onBlurR(this)" onfocus="this.select()">
+        <button class="rounds-btn" onclick="adjR(1)">+</button>
+      </div>
+    </div>
+
+  </div><!-- /outer wrapper -->
+
+  <!-- SUMMARY -->
+  <div class="summary-row">
+    <div class="summary-chip chip-intro">
+      <div class="s-val" id="sum-intro">—</div>
+      <div class="s-lbl">Intro</div>
+    </div>
+    <div class="summary-chip chip-work">
+      <div class="s-val" id="sum-work">—</div>
+      <div class="s-lbl">Work</div>
+    </div>
+    <div class="summary-chip chip-rest">
+      <div class="s-val" id="sum-rest">—</div>
+      <div class="s-lbl">Rest</div>
+    </div>
+    <div class="summary-chip chip-total">
+      <div class="s-val" id="sum-total">—</div>
+      <div class="s-lbl">Total</div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startWorkout()">START WORKOUT</button>
+
+</div><!-- /setup -->
+
+<!-- TIMER -->
+<div id="timer-panel">
+  <div class="phase-label" id="phase-label">WORK</div>
+
+  <div class="ring-wrap">
+    <svg class="ring-svg" viewBox="0 0 100 100">
+      <circle class="ring-bg" cx="50" cy="50" r="43"/>
+      <circle class="ring-progress" id="ring-prog" cx="50" cy="50" r="43"
+        stroke-dasharray="270.18" stroke-dashoffset="0" stroke="#ff3c3c"/>
+    </svg>
+    <div class="ring-center">
+      <div class="ring-time" id="ring-time">00:30</div>
+      <div class="ring-phase-mini" id="ring-mini">ROUND 1 OF 8</div>
+    </div>
+  </div>
+
+  <div class="dots-wrap" id="dots-wrap"></div>
+  <div class="next-up" id="next-up">NEXT: <span>REST 0:15</span></div>
+
+  <div class="controls">
+    <button class="ctrl-btn" onclick="stopWorkout()">✕ STOP</button>
+    <button class="ctrl-btn primary" id="pp-btn" onclick="togglePause()">⏸ PAUSE</button>
+    <button class="ctrl-btn" onclick="skipPhase()">⏭ SKIP</button>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="done-panel">
+  
+  <div class="done-title">WELL DONE</div>
+  <div class="done-stats">
+    <div class="done-stat"><div class="dv" id="dn-rounds">—</div><div class="dl">Rounds</div></div>
+    <div class="done-stat"><div class="dv" id="dn-time">—</div><div class="dl">Duration</div></div>
+  </div>
+  <button class="start-btn" onclick="resetAll()">↺ NEW WORKOUT</button>
+</div>
+
+</main>
+
+<script>
+// ── State ──
+const S = {
+  im: 0, is: 0,   // intro min/sec
+  wm: 0, ws: 0,   // work min/sec
+  rm: 0, rs: 0,   // rest min/sec
+  rounds: 1,
+  phase: 'work',   // 'work' | 'rest'
+  currentRound: 1,
+  remaining: 0,
+  total: 0,
+  running: false,
+  paused: false,
+  timer: null,
+  startEpoch: 0
+};
+
+const CIRC = 270.18;
+
+// ── Audio (Web Audio API) ──
+let ctx = null;
+function getCtx() {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  return ctx;
+}
+function beep(freq, dur, vol=0.4) {
+  try {
+    const ac = getCtx();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = 'square';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+    o.start(); o.stop(ac.currentTime + dur);
+  } catch(e){}
+}
+function beepWork()  { beep(880, .12); setTimeout(()=>beep(880,.12),150); }
+function beepRest()  { beep(440, .25); }
+function beepCount() { beep(660, .1, .3); }
+function beepDone()  { beep(523,.15); setTimeout(()=>beep(659,.15),180); setTimeout(()=>beep(784,.4),360); }
+
+// ── Adjusters ──
+function adj(key, delta) {
+  if (key==='im') S.im = Math.max(0, Math.min(59, S.im+delta));
+  if (key==='is') S.is = Math.max(0, Math.min(59, S.is+delta));
+  if (key==='wm') S.wm = Math.max(0, Math.min(59, S.wm+delta));
+  if (key==='ws') S.ws = Math.max(0, Math.min(59, S.ws+delta));
+  if (key==='rm') S.rm = Math.max(0, Math.min(59, S.rm+delta));
+  if (key==='rs') S.rs = Math.max(0, Math.min(59, S.rs+delta));
+  renderSetup();
+}
+function adjR(d) { S.rounds = Math.max(1, Math.min(99, S.rounds+d)); renderSetup(); }
+
+function pad(n) { return String(n).padStart(2,'0'); }
+function fmtSec(s) {
+  const m = Math.floor(s/60), sec = s%60;
+  return `${pad(m)}:${pad(sec)}`;
+}
+
+function renderSetup() {
+  document.getElementById('im-disp').value = pad(S.im);
+  document.getElementById('is-disp').value = pad(S.is);
+  document.getElementById('wm-disp').value = pad(S.wm);
+  document.getElementById('ws-disp').value = pad(S.ws);
+  document.getElementById('rm-disp').value = pad(S.rm);
+  document.getElementById('rs-disp').value = pad(S.rs);
+  document.getElementById('rounds-disp').value = S.rounds;
+  const w = S.wm*60+S.ws, r = S.rm*60+S.rs;
+  const total = (w+r)*S.rounds;
+  const intro = S.im*60+S.is;
+  document.getElementById('sum-total').textContent = total > 0 ? fmtSec(total) : '—';
+  document.getElementById('sum-intro').textContent = intro > 0 ? fmtSec(intro) : '—';
+  document.getElementById('sum-work').textContent  = w*S.rounds > 0 ? fmtSec(w*S.rounds) : '—';
+  document.getElementById('sum-rest').textContent  = r*S.rounds > 0 ? fmtSec(r*S.rounds) : '—';
+}
+
+// Live input handlers (while typing)
+function onInput(key, el) {
+  const v = parseInt(el.value) || 0;
+  S[key] = Math.max(0, Math.min(59, v));
+  updateSummary();
+}
+function onInputR(el) {
+  const v = parseInt(el.value) || 1;
+  S.rounds = Math.max(1, Math.min(99, v));
+  updateSummary();
+}
+// On blur: clamp and reformat with leading zero
+function onBlur(key, el) {
+  let v = parseInt(el.value);
+  if (isNaN(v)) v = 0;
+  v = Math.max(0, Math.min(59, v));
+  S[key] = v;
+  el.value = pad(v);
+  updateSummary();
+}
+function onBlurR(el) {
+  let v = parseInt(el.value);
+  if (isNaN(v) || v < 1) v = 1;
+  v = Math.min(99, v);
+  S.rounds = v;
+  el.value = v;
+  updateSummary();
+}
+function updateSummary() {
+  const w = S.wm*60+S.ws, r = S.rm*60+S.rs, intro = S.im*60+S.is;
+  const total = intro + (w+r)*S.rounds;
+  document.getElementById('sum-total').textContent = total > 0 ? fmtSec(total) : '—';
+  document.getElementById('sum-intro').textContent = intro > 0 ? fmtSec(intro) : '—';
+  document.getElementById('sum-work').textContent  = w*S.rounds > 0 ? fmtSec(w*S.rounds) : '—';
+  document.getElementById('sum-rest').textContent  = r*S.rounds > 0 ? fmtSec(r*S.rounds) : '—';
+}
+
+// ── Tabs ──
+function showSetup() {
+  document.getElementById('setup-panel').style.display = '';
+  document.getElementById('timer-panel').style.display = 'none';
+  document.getElementById('done-panel').style.display = 'none';
+  document.getElementById('tab-setup').className = 'tab active-setup';
+  document.getElementById('tab-timer').className = 'tab';
+}
+function showTimer() {
+  document.getElementById('setup-panel').style.display = 'none';
+  document.getElementById('done-panel').style.display = 'none';
+  document.getElementById('timer-panel').style.display = 'flex';
+  document.getElementById('tab-setup').className = 'tab';
+  document.getElementById('tab-timer').className = 'tab active-work';
+}
+
+// ── Build dots ──
+function buildDots() {
+  const wrap = document.getElementById('dots-wrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < S.rounds; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' active':'');
+    d.id = 'dot-'+i;
+    wrap.appendChild(d);
+  }
+}
+function updateDots() {
+  for (let i = 0; i < S.rounds; i++) {
+    const d = document.getElementById('dot-'+i);
+    if (!d) continue;
+    d.className = 'dot' + (i < S.currentRound-1 ? ' done' : i===S.currentRound-1 ? ' active' : '');
+  }
+}
+
+// ── Flash ──
+function flashScreen(color) {
+  const f = document.getElementById('flash');
+  f.style.background = color;
+  f.style.opacity = '.18';
+  setTimeout(() => f.style.opacity = '0', 150);
+}
+
+// ── Ring ──
+function setRing(ratio, color) {
+  const p = document.getElementById('ring-prog');
+  p.style.stroke = color;
+  p.style.strokeDashoffset = CIRC * (1 - ratio);
+}
+
+// ── UI update ──
+function updateTimerUI() {
+  const isIntro = S.phase === 'intro';
+  const isWork  = S.phase === 'work';
+  const color   = isIntro ? 'var(--accent)' : isWork ? 'var(--work)' : 'var(--rest)';
+  const label   = isIntro ? '⏱ INTRO' : isWork ? '🔥 WORK' : '💤 REST';
+  const total   = isIntro ? (S.im*60+S.is) : isWork ? (S.wm*60+S.ws) : (S.rm*60+S.rs);
+  const ratio   = total > 0 ? S.remaining / total : 0;
+
+  document.getElementById('phase-label').textContent = label;
+  document.getElementById('phase-label').style.color = color;
+  document.getElementById('ring-time').textContent =
+    pad(Math.floor(S.remaining/60)) + ':' + pad(S.remaining%60);
+  document.getElementById('ring-time').style.color = color;
+  document.getElementById('ring-mini').textContent =
+    isIntro ? 'GET READY' : `ROUND ${S.currentRound} OF ${S.rounds}`;
+  document.getElementById('hdr-round').textContent = isIntro ? '–' : S.currentRound;
+  document.getElementById('hdr-total').textContent = S.rounds;
+
+  setRing(ratio, color);
+  if (!isIntro) updateDots();
+
+  // Next up
+  let nextText = '';
+  if (isIntro) {
+    nextText = `WORK ${pad(S.wm)}:${pad(S.ws)}`;
+  } else if (isWork) {
+    nextText = `REST ${pad(S.rm)}:${pad(S.rs)}`;
+  } else {
+    nextText = S.currentRound < S.rounds ? `WORK ${pad(S.wm)}:${pad(S.ws)}` : 'FINISH!';
+  }
+  document.getElementById('next-up').innerHTML = `NEXT: <span>${nextText}</span>`;
+
+  const ppBtn = document.getElementById('pp-btn');
+  ppBtn.className = 'ctrl-btn primary' + (isWork ? '' : isIntro ? ' intro-phase' : ' rest-phase');
+}
+
+// ── Timer tick ──
+function tick() {
+  if (S.paused) return;
+  S.remaining--;
+
+  // Countdown beeps at 3,2,1
+  if (S.remaining <= 3 && S.remaining > 0) {
+    beepCount();
+  }
+
+  updateTimerUI();
+
+  if (S.remaining <= 0) {
+    advancePhase();
+  }
+}
+
+function advancePhase() {
+  if (S.phase === 'intro') {
+    // Intro done — start first work interval
+    S.phase = 'work';
+    S.remaining = S.wm*60+S.ws;
+    beepWork(); flashScreen('#ff3c3c');
+  } else if (S.phase === 'work') {
+    if (S.rm*60+S.rs > 0) {
+      S.phase = 'rest';
+      S.remaining = S.rm*60+S.rs;
+      beepRest(); flashScreen('#00e5a0');
+    } else {
+      nextRound(); return;
+    }
+  } else {
+    nextRound(); return;
+  }
+  updateTimerUI();
+}
+
+function nextRound() {
+  if (S.currentRound >= S.rounds) {
+    // Done!
+    finishWorkout();
+    return;
+  }
+  S.currentRound++;
+  S.phase = 'work';
+  S.remaining = S.wm*60+S.ws;
+  beepWork(); flashScreen('#ff3c3c');
+  updateTimerUI();
+}
+
+// ── Start / Stop ──
+function startWorkout() {
+  const workSecs = S.wm*60+S.ws;
+  if (workSecs === 0) { alert('Please set a Work time first!'); return; }
+  getCtx();
+  const introSecs = S.im*60+S.is;
+  if (introSecs > 0) {
+    S.phase = 'intro';
+    S.remaining = introSecs;
+  } else {
+    S.phase = 'work';
+    S.remaining = workSecs;
+  }
+  S.currentRound = 1;
+  S.running = true;
+  S.paused = false;
+  S.startEpoch = Date.now();
+  document.getElementById('hdr-total').textContent = S.rounds;
+  buildDots();
+  showTimer();
+  updateTimerUI();
+  if (S.phase === 'intro') {
+    flashScreen('#ff8c00');
+  } else {
+    beepWork(); flashScreen('#ff3c3c');
+  }
+  clearInterval(S.timer);
+  S.timer = setInterval(tick, 1000);
+}
+
+function togglePause() {
+  S.paused = !S.paused;
+  const btn = document.getElementById('pp-btn');
+  btn.textContent = S.paused ? '▶ RESUME' : '⏸ PAUSE';
+}
+
+function skipPhase() {
+  S.remaining = 1;
+}
+
+function stopWorkout() {
+  clearInterval(S.timer);
+  S.running = false;
+  resetAll();
+}
+
+function finishWorkout() {
+  clearInterval(S.timer);
+  S.running = false;
+  beepDone();
+  const elapsed = Math.round((Date.now() - S.startEpoch)/1000);
+  document.getElementById('dn-rounds').textContent = S.rounds;
+  document.getElementById('dn-time').textContent = fmtSec(elapsed);
+  document.getElementById('setup-panel').style.display = 'none';
+  document.getElementById('timer-panel').style.display = 'none';
+  document.getElementById('done-panel').style.display = 'flex';
+  document.getElementById('tab-setup').className = 'tab';
+  document.getElementById('tab-timer').className = 'tab';
+}
+
+function resetAll() {
+  clearInterval(S.timer);
+  S.running = false; S.paused = false;
+  document.getElementById('pp-btn').textContent = '⏸ PAUSE';
+  document.getElementById('hdr-round').textContent = '0';
+  renderSetup();
+  showSetup();
+}
+
+// init
+renderSetup();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
+</body>
+</html>
