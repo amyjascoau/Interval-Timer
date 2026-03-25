@@ -38,7 +38,7 @@
 
   /* ── HEADER ── */
   header {
-    padding: 10px 14px 8px;
+    padding: 6px 12px 5px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -66,15 +66,15 @@
   /* ── TABS ── */
   .tabs {
     display: flex;
-    margin: 6px 14px 0;
+    margin: 4px 12px 0;
     background: var(--surface);
     border-radius: 10px;
-    padding: 3px;
+    padding: 2px;
     gap: 3px;
   }
   .tab {
     flex: 1;
-    padding: 5px;
+    padding: 4px;
     text-align: center;
     font-family: 'Bebas Neue', sans-serif;
     font-size: 16px;
@@ -88,19 +88,17 @@
   .tab.active-setup { background: var(--card); color: var(--text); }
 
   /* ── MAIN CONTENT ── */
-  main { flex: 1; padding: 8px 14px; display: flex; flex-direction: column; gap: 8px; }
+  main { flex: 1; padding: 6px 12px; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
 
   /* ── SETUP PANEL ── */
-  #setup-panel { display: flex; flex-direction: column; gap: 8px; }
+  #setup-panel { display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0; }
 
   /* ── TIMER CARDS & SHARED GRID ── */
   .cards-grid {
     display: grid;
-    /* label | MIN stepper | colon | SEC stepper */
     grid-template-columns: auto 1fr auto 1fr;
+    flex: 1;
     background: var(--card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
     overflow: hidden;
     position: relative;
   }
@@ -130,23 +128,25 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
-    padding: 7px 5px 7px;
+    justify-content: center;
+    padding: 6px 5px;
+    align-self: stretch;
   }
   .cell-label {
     align-items: flex-start;
     padding-left: 14px;
     justify-content: center;
     min-width: 58px;
+    padding-top: 0;
   }
   .cell-sep {
     padding: 0 1px;
-    justify-content: flex-end;
-    padding-bottom: 9px;
+    justify-content: center;
+    padding-top: 12px; /* offset for field-lbl above sibling cells */
   }
 
   .field-lbl {
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 1.5px;
     color: var(--muted);
     text-transform: uppercase;
@@ -155,7 +155,7 @@
   }
   .card-label {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 2px;
     line-height: 1.1;
   }
@@ -185,22 +185,24 @@
     overflow: hidden;
     border: 1px solid var(--border);
     width: 100%;
+    flex: 1;
   }
   .time-btn {
     background: var(--bg);
     border: none;
     color: var(--text);
-    width: 26px;
-    font-size: 15px;
+    width: 36px;
+    font-size: 18px;
     cursor: pointer;
     transition: background .15s;
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
+    align-self: stretch;
   }
   .time-btn:active { background: #2a2a2a; }
   .time-display {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
+    font-size: 28px;
     letter-spacing: 1px;
     background: var(--surface);
     border: none;
@@ -209,10 +211,14 @@
     flex: 1;
     min-width: 0;
     text-align: center;
-    padding: 5px 0;
+    padding: 0;
     outline: none;
     -moz-appearance: textfield;
     appearance: textfield;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .time-display::-webkit-inner-spin-button,
   .time-display::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -226,13 +232,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 12px 8px 14px;
+    padding: 10px 12px 10px 14px;
     border-top: 1px solid var(--border);
     background: var(--card);
   }
   .rounds-row-label {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 2px;
     color: var(--work);
   }
@@ -247,9 +253,9 @@
     background: var(--bg);
     color: var(--text);
     border: none;
-    width: 34px;
-    height: 34px;
-    font-size: 18px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
     cursor: pointer;
     transition: background .15s;
     display: flex; align-items: center; justify-content: center;
@@ -257,15 +263,15 @@
   .rounds-btn:active { background: #2a2a2a; }
   .rounds-input {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    width: 48px;
+    font-size: 24px;
+    width: 60px;
     text-align: center;
     background: var(--surface);
     color: var(--accent);
     border: none;
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
-    padding: 4px 0;
+    padding: 8px 0;
     outline: none;
     -moz-appearance: textfield;
     appearance: textfield;
@@ -283,13 +289,13 @@
     flex: 1;
     background: var(--surface);
     border-radius: 8px;
-    padding: 7px 4px;
+    padding: 8px 3px;
     text-align: center;
     border: 1px solid var(--border);
   }
   .summary-chip .s-val {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
+    font-size: 18px;
     letter-spacing: 0px;
   }
   .summary-chip .s-lbl {
@@ -309,9 +315,9 @@
     color: #fff;
     border: none;
     border-radius: var(--radius);
-    padding: 14px;
+    padding: 16px;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
+    font-size: 24px;
     letter-spacing: 4px;
     cursor: pointer;
     width: 100%;
@@ -321,21 +327,21 @@
   .start-btn:active { transform: scale(.97); opacity: .9; }
 
   /* ── TIMER PANEL ── */
-  #timer-panel { display: none; flex-direction: column; align-items: center; gap: 0; }
+  #timer-panel { display: none; flex-direction: column; align-items: center; gap: 0; padding-top: 4px; }
 
   .phase-label {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 6px;
-    margin-bottom: 8px;
+    font-size: 16px;
+    letter-spacing: 5px;
+    margin-bottom: 4px;
     transition: color .3s;
   }
 
   /* Ring */
   .ring-wrap {
     position: relative;
-    width: 260px; height: 260px;
-    margin: 4px 0 8px;
+    width: 220px; height: 220px;
+    margin: 2px 0 6px;
   }
   .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
   .ring-bg { fill: none; stroke: var(--surface); stroke-width: 14; }
@@ -353,7 +359,7 @@
   }
   .ring-time {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 72px;
+    font-size: 60px;
     letter-spacing: 2px;
     line-height: 1;
     transition: color .3s;
@@ -372,7 +378,7 @@
     flex-wrap: wrap;
     justify-content: center;
     max-width: 300px;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
   }
   .dot {
     width: 12px; height: 12px;
@@ -388,19 +394,19 @@
     font-size: 13px;
     letter-spacing: 2px;
     color: var(--muted);
-    margin-bottom: 16px;
+    margin-bottom: 8px;
   }
   .next-up span { color: var(--text); }
 
   /* Controls */
   .controls {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
   }
   .ctrl-btn {
     flex: 1;
-    padding: 16px;
+    padding: 12px;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--card);
@@ -427,10 +433,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 12px;
     flex: 1;
     text-align: center;
-    padding: 20px;
+    padding: 14px;
   }
   .done-emoji { font-size: 64px; }
   .done-title {
@@ -499,7 +505,7 @@
 <div id="setup-panel">
 
   <!-- ALL 3 TIMERS — shared grid for perfect column alignment, rounds on its own row -->
-  <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;">
+  <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;flex:1;">
 
     <div class="cards-grid">
       <!-- INTRO ROW -->
@@ -864,33 +870,45 @@ function updateTimerUI() {
   ppBtn.className = 'ctrl-btn primary' + (isWork ? '' : isIntro ? ' intro-phase' : ' rest-phase');
 }
 
-// ── Timer tick ──
+// ── Timer tick — uses real wall-clock time so it works in background ──
+let S_phaseStart = 0;   // Date.now() when current phase began
+let S_phaseTotal = 0;   // total seconds in current phase
+
 function tick() {
   if (S.paused) return;
-  S.remaining--;
 
-  // Countdown beeps at 3,2,1
-  if (S.remaining <= 3 && S.remaining > 0) {
-    beepCount();
+  const elapsed = Math.floor((Date.now() - S_phaseStart) / 1000);
+  const newRemaining = Math.max(0, S_phaseTotal - elapsed);
+
+  // Beep on 3,2,1 transitions
+  if (newRemaining !== S.remaining) {
+    if (newRemaining <= 3 && newRemaining > 0 && newRemaining < S.remaining) {
+      beepCount();
+    }
+    S.remaining = newRemaining;
+    updateTimerUI();
   }
-
-  updateTimerUI();
 
   if (S.remaining <= 0) {
     advancePhase();
   }
 }
 
+function startPhase(seconds) {
+  S_phaseTotal = seconds;
+  S_phaseStart = Date.now();
+  S.remaining  = seconds;
+}
+
 function advancePhase() {
   if (S.phase === 'intro') {
-    // Intro done — start first work interval
     S.phase = 'work';
-    S.remaining = S.wm*60+S.ws;
+    startPhase(S.wm*60+S.ws);
     beepWork(); flashScreen('#ff3c3c');
   } else if (S.phase === 'work') {
     if (S.rm*60+S.rs > 0) {
       S.phase = 'rest';
-      S.remaining = S.rm*60+S.rs;
+      startPhase(S.rm*60+S.rs);
       beepRest(); flashScreen('#00e5a0');
     } else {
       nextRound(); return;
@@ -903,13 +921,12 @@ function advancePhase() {
 
 function nextRound() {
   if (S.currentRound >= S.rounds) {
-    // Done!
     finishWorkout();
     return;
   }
   S.currentRound++;
   S.phase = 'work';
-  S.remaining = S.wm*60+S.ws;
+  startPhase(S.wm*60+S.ws);
   beepWork(); flashScreen('#ff3c3c');
   updateTimerUI();
 }
@@ -934,18 +951,28 @@ function startWorkout() {
   document.getElementById('hdr-total').textContent = S.rounds;
   buildDots();
   showTimer();
-  updateTimerUI();
   if (S.phase === 'intro') {
+    startPhase(S.im*60+S.is);
     flashScreen('#ff8c00');
   } else {
+    startPhase(S.wm*60+S.ws);
     beepWork(); flashScreen('#ff3c3c');
   }
+  updateTimerUI();
   clearInterval(S.timer);
-  S.timer = setInterval(tick, 1000);
+  S.timer = setInterval(tick, 250); // poll 4x/sec for accuracy
 }
 
+let S_pausedAt = 0;
 function togglePause() {
   S.paused = !S.paused;
+  if (S.paused) {
+    S_pausedAt = Date.now();
+  } else {
+    // Shift phaseStart forward by the time we were paused
+    const pausedDuration = Date.now() - S_pausedAt;
+    S_phaseStart += pausedDuration;
+  }
   const btn = document.getElementById('pp-btn');
   btn.textContent = S.paused ? '▶ RESUME' : '⏸ PAUSE';
 }
@@ -982,6 +1009,20 @@ function resetAll() {
   renderSetup();
   showSetup();
 }
+
+// ── Page Visibility — correct clock drift when app returns from background ──
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && S.running && !S.paused) {
+    // Recalculate remaining immediately when app comes back into view
+    const elapsed = Math.floor((Date.now() - S_phaseStart) / 1000);
+    S.remaining = Math.max(0, S_phaseTotal - elapsed);
+    if (S.remaining <= 0) {
+      advancePhase();
+    } else {
+      updateTimerUI();
+    }
+  }
+});
 
 // init
 renderSetup();
