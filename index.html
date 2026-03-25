@@ -93,65 +93,20 @@
   /* ── SETUP PANEL ── */
   #setup-panel { display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0; }
 
-  /* ── TIMER CARDS & SHARED GRID ── */
-  .cards-grid {
-    display: grid;
-    grid-template-columns: auto 1fr auto 1fr;
+  /* ── TIMER CARDS ── */
+  /* Each card is a simple flex row: [label] [stepper-group] */
+  .timer-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px 10px 14px;
+    gap: 10px;
     flex: 1;
-    background: var(--card);
-    overflow: hidden;
-    position: relative;
   }
-  /* tri-colour accent bar */
-  .cards-grid::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 4px; height: 100%;
-    background: linear-gradient(to bottom,
-      var(--accent) 33.33%,
-      var(--work)   33.33% 66.66%,
-      var(--rest)   66.66%);
-    z-index: 1;
-  }
-
-  .card-row { display: contents; }
-
-  .card-divider {
-    grid-column: 1 / -1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* Grid cells */
-  .cell {
+  .timer-row-label {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    padding: 6px 5px;
-    align-self: stretch;
-  }
-  .cell-label {
-    align-items: flex-start;
-    padding-left: 14px;
-    justify-content: center;
-    min-width: 58px;
-    padding-top: 0;
-  }
-  .cell-sep {
-    padding: 0 1px;
-    justify-content: center;
-    padding-top: 12px; /* offset for field-lbl above sibling cells */
-  }
-
-  .field-lbl {
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 3px;
-    align-self: center;
+    min-width: 56px;
   }
   .card-label {
     font-family: 'Bebas Neue', sans-serif;
@@ -164,20 +119,54 @@
     letter-spacing: 0.5px;
     color: var(--muted);
     text-transform: uppercase;
-    margin-top: 1px;
+    margin-top: 2px;
   }
   .intro-card .card-label { color: var(--accent); }
   .work-card  .card-label { color: var(--work); }
   .rest-card  .card-label { color: var(--rest); }
 
+  /* The MM:SS group — two steppers with colon between, all same height */
+  .time-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .stepper-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+  }
+  .field-lbl {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .time-sep-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .time-sep-spacer {
+    font-size: 10px;
+    line-height: 1;
+    visibility: hidden;
+  }
   .time-sep {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
+    font-size: 22px;
     color: var(--muted);
     line-height: 1;
   }
 
-  /* Horizontal [+] [num] [−] stepper */
+  /* Stepper: [+] [num] [−] */
   .stepper {
     display: flex;
     align-items: stretch;
@@ -185,7 +174,7 @@
     overflow: hidden;
     border: 1px solid var(--border);
     width: 100%;
-    flex: 1;
+    height: 44px;
   }
   .time-btn {
     background: var(--bg);
@@ -197,12 +186,11 @@
     transition: background .15s;
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    align-self: stretch;
   }
   .time-btn:active { background: #2a2a2a; }
   .time-display {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
+    font-size: 26px;
     letter-spacing: 1px;
     background: var(--surface);
     border: none;
@@ -215,10 +203,6 @@
     outline: none;
     -moz-appearance: textfield;
     appearance: textfield;
-    align-self: stretch;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
   .time-display::-webkit-inner-spin-button,
   .time-display::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -504,17 +488,20 @@
 <!-- SETUP -->
 <div id="setup-panel">
 
-  <!-- ALL 3 TIMERS — shared grid for perfect column alignment, rounds on its own row -->
-  <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;flex:1;">
+  <!-- ALL 3 TIMERS + ROUNDS -->
+  <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;flex:1;position:relative;">
 
-    <div class="cards-grid">
-      <!-- INTRO ROW -->
-      <div class="card-row intro-card">
-        <div class="cell cell-label">
-          <div class="card-label">⏱ INTRO</div>
-          <div class="card-sublbl">once only</div>
-        </div>
-        <div class="cell">
+    <!-- accent bar -->
+    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(to bottom,var(--accent) 33.33%,var(--work) 33.33% 66.66%,var(--rest) 66.66%);z-index:1;pointer-events:none;"></div>
+
+    <!-- INTRO ROW -->
+    <div class="timer-row intro-card" style="flex:1;border-bottom:1px solid var(--border);">
+      <div class="timer-row-label">
+        <div class="card-label">⏱ INTRO</div>
+        <div class="card-sublbl">once only</div>
+      </div>
+      <div class="time-group">
+        <div class="stepper-col">
           <div class="field-lbl">MIN</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('im',1)">+</button>
@@ -523,8 +510,11 @@
             <button class="time-btn" onclick="adj('im',-1)">−</button>
           </div>
         </div>
-        <div class="cell cell-sep"><div class="time-sep">:</div></div>
-        <div class="cell">
+        <div class="time-sep-col">
+          <div class="time-sep-spacer">M</div>
+          <div class="time-sep">:</div>
+        </div>
+        <div class="stepper-col">
           <div class="field-lbl">SEC</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('is',5)">+</button>
@@ -534,15 +524,15 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="card-divider"></div>
-
-      <!-- WORK ROW -->
-      <div class="card-row work-card">
-        <div class="cell cell-label">
-          <div class="card-label">🔥 WORK</div>
-        </div>
-        <div class="cell">
+    <!-- WORK ROW -->
+    <div class="timer-row work-card" style="flex:1;border-bottom:1px solid var(--border);">
+      <div class="timer-row-label">
+        <div class="card-label">🔥 WORK</div>
+      </div>
+      <div class="time-group">
+        <div class="stepper-col">
           <div class="field-lbl">MIN</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('wm',1)">+</button>
@@ -551,8 +541,11 @@
             <button class="time-btn" onclick="adj('wm',-1)">−</button>
           </div>
         </div>
-        <div class="cell cell-sep"><div class="time-sep">:</div></div>
-        <div class="cell">
+        <div class="time-sep-col">
+          <div class="time-sep-spacer">M</div>
+          <div class="time-sep">:</div>
+        </div>
+        <div class="stepper-col">
           <div class="field-lbl">SEC</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('ws',5)">+</button>
@@ -562,15 +555,15 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="card-divider"></div>
-
-      <!-- REST ROW -->
-      <div class="card-row rest-card">
-        <div class="cell cell-label">
-          <div class="card-label">💤 REST</div>
-        </div>
-        <div class="cell">
+    <!-- REST ROW -->
+    <div class="timer-row rest-card" style="flex:1;border-bottom:1px solid var(--border);">
+      <div class="timer-row-label">
+        <div class="card-label">💤 REST</div>
+      </div>
+      <div class="time-group">
+        <div class="stepper-col">
           <div class="field-lbl">MIN</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('rm',1)">+</button>
@@ -579,8 +572,11 @@
             <button class="time-btn" onclick="adj('rm',-1)">−</button>
           </div>
         </div>
-        <div class="cell cell-sep"><div class="time-sep">:</div></div>
-        <div class="cell">
+        <div class="time-sep-col">
+          <div class="time-sep-spacer">M</div>
+          <div class="time-sep">:</div>
+        </div>
+        <div class="stepper-col">
           <div class="field-lbl">SEC</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('rs',5)">+</button>
@@ -590,9 +586,9 @@
           </div>
         </div>
       </div>
-    </div><!-- /cards-grid -->
+    </div>
 
-    <!-- ROUNDS ROW — full width, below the 3 time rows -->
+    <!-- ROUNDS ROW -->
     <div class="rounds-row">
       <div class="rounds-row-label">🔁 ROUNDS</div>
       <div class="rounds-stepper">
