@@ -38,7 +38,7 @@
 
   /* ── HEADER ── */
   header {
-    padding: 10px 14px 8px;
+    padding: 6px 12px 5px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -66,15 +66,15 @@
   /* ── TABS ── */
   .tabs {
     display: flex;
-    margin: 6px 14px 0;
+    margin: 4px 12px 0;
     background: var(--surface);
     border-radius: 10px;
-    padding: 3px;
+    padding: 2px;
     gap: 3px;
   }
   .tab {
     flex: 1;
-    padding: 5px;
+    padding: 4px;
     text-align: center;
     font-family: 'Bebas Neue', sans-serif;
     font-size: 16px;
@@ -88,74 +88,29 @@
   .tab.active-setup { background: var(--card); color: var(--text); }
 
   /* ── MAIN CONTENT ── */
-  main { flex: 1; padding: 8px 14px; display: flex; flex-direction: column; gap: 8px; }
+  main { flex: 1; padding: 6px 12px; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
 
   /* ── SETUP PANEL ── */
-  #setup-panel { display: flex; flex-direction: column; gap: 8px; }
+  #setup-panel { display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0; }
 
-  /* ── TIMER CARDS & SHARED GRID ── */
-  .cards-grid {
-    display: grid;
-    /* label | MIN stepper | colon | SEC stepper */
-    grid-template-columns: auto 1fr auto 1fr;
-    background: var(--card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    position: relative;
+  /* ── TIMER CARDS ── */
+  /* Each card is a simple flex row: [label] [stepper-group] */
+  .timer-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px 10px 14px;
+    gap: 10px;
+    flex: 1;
   }
-  /* tri-colour accent bar */
-  .cards-grid::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 4px; height: 100%;
-    background: linear-gradient(to bottom,
-      var(--accent) 33.33%,
-      var(--work)   33.33% 66.66%,
-      var(--rest)   66.66%);
-    z-index: 1;
-  }
-
-  .card-row { display: contents; }
-
-  .card-divider {
-    grid-column: 1 / -1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* Grid cells */
-  .cell {
+  .timer-row-label {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 7px 5px 7px;
-  }
-  .cell-label {
-    align-items: flex-start;
-    padding-left: 14px;
     justify-content: center;
-    min-width: 58px;
-  }
-  .cell-sep {
-    padding: 0 1px;
-    justify-content: flex-end;
-    padding-bottom: 9px;
-  }
-
-  .field-lbl {
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 3px;
-    align-self: center;
+    min-width: 56px;
   }
   .card-label {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 2px;
     line-height: 1.1;
   }
@@ -164,20 +119,54 @@
     letter-spacing: 0.5px;
     color: var(--muted);
     text-transform: uppercase;
-    margin-top: 1px;
+    margin-top: 2px;
   }
   .intro-card .card-label { color: var(--accent); }
   .work-card  .card-label { color: var(--work); }
   .rest-card  .card-label { color: var(--rest); }
 
+  /* The MM:SS group — two steppers with colon between, all same height */
+  .time-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .stepper-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+  }
+  .field-lbl {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .time-sep-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .time-sep-spacer {
+    font-size: 10px;
+    line-height: 1;
+    visibility: hidden;
+  }
   .time-sep {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
+    font-size: 22px;
     color: var(--muted);
     line-height: 1;
   }
 
-  /* Horizontal [+] [num] [−] stepper */
+  /* Stepper: [+] [num] [−] */
   .stepper {
     display: flex;
     align-items: stretch;
@@ -185,13 +174,14 @@
     overflow: hidden;
     border: 1px solid var(--border);
     width: 100%;
+    height: 44px;
   }
   .time-btn {
     background: var(--bg);
     border: none;
     color: var(--text);
-    width: 26px;
-    font-size: 15px;
+    width: 36px;
+    font-size: 18px;
     cursor: pointer;
     transition: background .15s;
     flex-shrink: 0;
@@ -200,7 +190,7 @@
   .time-btn:active { background: #2a2a2a; }
   .time-display {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
+    font-size: 26px;
     letter-spacing: 1px;
     background: var(--surface);
     border: none;
@@ -209,7 +199,7 @@
     flex: 1;
     min-width: 0;
     text-align: center;
-    padding: 5px 0;
+    padding: 0;
     outline: none;
     -moz-appearance: textfield;
     appearance: textfield;
@@ -226,13 +216,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 12px 8px 14px;
+    padding: 10px 12px 10px 14px;
     border-top: 1px solid var(--border);
     background: var(--card);
   }
   .rounds-row-label {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 2px;
     color: var(--work);
   }
@@ -247,9 +237,9 @@
     background: var(--bg);
     color: var(--text);
     border: none;
-    width: 34px;
-    height: 34px;
-    font-size: 18px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
     cursor: pointer;
     transition: background .15s;
     display: flex; align-items: center; justify-content: center;
@@ -257,15 +247,15 @@
   .rounds-btn:active { background: #2a2a2a; }
   .rounds-input {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    width: 48px;
+    font-size: 24px;
+    width: 60px;
     text-align: center;
     background: var(--surface);
     color: var(--accent);
     border: none;
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
-    padding: 4px 0;
+    padding: 8px 0;
     outline: none;
     -moz-appearance: textfield;
     appearance: textfield;
@@ -283,13 +273,13 @@
     flex: 1;
     background: var(--surface);
     border-radius: 8px;
-    padding: 7px 4px;
+    padding: 8px 3px;
     text-align: center;
     border: 1px solid var(--border);
   }
   .summary-chip .s-val {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
+    font-size: 18px;
     letter-spacing: 0px;
   }
   .summary-chip .s-lbl {
@@ -309,9 +299,9 @@
     color: #fff;
     border: none;
     border-radius: var(--radius);
-    padding: 14px;
+    padding: 16px;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
+    font-size: 24px;
     letter-spacing: 4px;
     cursor: pointer;
     width: 100%;
@@ -321,21 +311,21 @@
   .start-btn:active { transform: scale(.97); opacity: .9; }
 
   /* ── TIMER PANEL ── */
-  #timer-panel { display: none; flex-direction: column; align-items: center; gap: 0; }
+  #timer-panel { display: none; flex-direction: column; align-items: center; gap: 0; padding-top: 4px; }
 
   .phase-label {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 6px;
-    margin-bottom: 8px;
+    font-size: 16px;
+    letter-spacing: 5px;
+    margin-bottom: 4px;
     transition: color .3s;
   }
 
   /* Ring */
   .ring-wrap {
     position: relative;
-    width: 260px; height: 260px;
-    margin: 4px 0 8px;
+    width: 220px; height: 220px;
+    margin: 2px 0 6px;
   }
   .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
   .ring-bg { fill: none; stroke: var(--surface); stroke-width: 14; }
@@ -353,7 +343,7 @@
   }
   .ring-time {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 72px;
+    font-size: 60px;
     letter-spacing: 2px;
     line-height: 1;
     transition: color .3s;
@@ -372,7 +362,7 @@
     flex-wrap: wrap;
     justify-content: center;
     max-width: 300px;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
   }
   .dot {
     width: 12px; height: 12px;
@@ -388,19 +378,19 @@
     font-size: 13px;
     letter-spacing: 2px;
     color: var(--muted);
-    margin-bottom: 16px;
+    margin-bottom: 8px;
   }
   .next-up span { color: var(--text); }
 
   /* Controls */
   .controls {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
   }
   .ctrl-btn {
     flex: 1;
-    padding: 16px;
+    padding: 12px;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--card);
@@ -427,10 +417,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 12px;
     flex: 1;
     text-align: center;
-    padding: 20px;
+    padding: 14px;
   }
   .done-emoji { font-size: 64px; }
   .done-title {
@@ -498,17 +488,20 @@
 <!-- SETUP -->
 <div id="setup-panel">
 
-  <!-- ALL 3 TIMERS — shared grid for perfect column alignment, rounds on its own row -->
-  <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;">
+  <!-- ALL 3 TIMERS + ROUNDS -->
+  <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;flex:1;position:relative;">
 
-    <div class="cards-grid">
-      <!-- INTRO ROW -->
-      <div class="card-row intro-card">
-        <div class="cell cell-label">
-          <div class="card-label">⏱ INTRO</div>
-          <div class="card-sublbl">once only</div>
-        </div>
-        <div class="cell">
+    <!-- accent bar -->
+    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(to bottom,var(--accent) 33.33%,var(--work) 33.33% 66.66%,var(--rest) 66.66%);z-index:1;pointer-events:none;"></div>
+
+    <!-- INTRO ROW -->
+    <div class="timer-row intro-card" style="flex:1;border-bottom:1px solid var(--border);">
+      <div class="timer-row-label">
+        <div class="card-label">⏱ INTRO</div>
+        <div class="card-sublbl">once only</div>
+      </div>
+      <div class="time-group">
+        <div class="stepper-col">
           <div class="field-lbl">MIN</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('im',1)">+</button>
@@ -517,8 +510,11 @@
             <button class="time-btn" onclick="adj('im',-1)">−</button>
           </div>
         </div>
-        <div class="cell cell-sep"><div class="time-sep">:</div></div>
-        <div class="cell">
+        <div class="time-sep-col">
+          <div class="time-sep-spacer">M</div>
+          <div class="time-sep">:</div>
+        </div>
+        <div class="stepper-col">
           <div class="field-lbl">SEC</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('is',5)">+</button>
@@ -528,15 +524,15 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="card-divider"></div>
-
-      <!-- WORK ROW -->
-      <div class="card-row work-card">
-        <div class="cell cell-label">
-          <div class="card-label">🔥 WORK</div>
-        </div>
-        <div class="cell">
+    <!-- WORK ROW -->
+    <div class="timer-row work-card" style="flex:1;border-bottom:1px solid var(--border);">
+      <div class="timer-row-label">
+        <div class="card-label">🔥 WORK</div>
+      </div>
+      <div class="time-group">
+        <div class="stepper-col">
           <div class="field-lbl">MIN</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('wm',1)">+</button>
@@ -545,8 +541,11 @@
             <button class="time-btn" onclick="adj('wm',-1)">−</button>
           </div>
         </div>
-        <div class="cell cell-sep"><div class="time-sep">:</div></div>
-        <div class="cell">
+        <div class="time-sep-col">
+          <div class="time-sep-spacer">M</div>
+          <div class="time-sep">:</div>
+        </div>
+        <div class="stepper-col">
           <div class="field-lbl">SEC</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('ws',5)">+</button>
@@ -556,15 +555,15 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="card-divider"></div>
-
-      <!-- REST ROW -->
-      <div class="card-row rest-card">
-        <div class="cell cell-label">
-          <div class="card-label">💤 REST</div>
-        </div>
-        <div class="cell">
+    <!-- REST ROW -->
+    <div class="timer-row rest-card" style="flex:1;border-bottom:1px solid var(--border);">
+      <div class="timer-row-label">
+        <div class="card-label">💤 REST</div>
+      </div>
+      <div class="time-group">
+        <div class="stepper-col">
           <div class="field-lbl">MIN</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('rm',1)">+</button>
@@ -573,8 +572,11 @@
             <button class="time-btn" onclick="adj('rm',-1)">−</button>
           </div>
         </div>
-        <div class="cell cell-sep"><div class="time-sep">:</div></div>
-        <div class="cell">
+        <div class="time-sep-col">
+          <div class="time-sep-spacer">M</div>
+          <div class="time-sep">:</div>
+        </div>
+        <div class="stepper-col">
           <div class="field-lbl">SEC</div>
           <div class="stepper">
             <button class="time-btn" onclick="adj('rs',5)">+</button>
@@ -584,9 +586,9 @@
           </div>
         </div>
       </div>
-    </div><!-- /cards-grid -->
+    </div>
 
-    <!-- ROUNDS ROW — full width, below the 3 time rows -->
+    <!-- ROUNDS ROW -->
     <div class="rounds-row">
       <div class="rounds-row-label">🔁 ROUNDS</div>
       <div class="rounds-stepper">
@@ -702,8 +704,15 @@ function beep(freq, dur, vol=0.4) {
 }
 function beepWork()  { beep(880, .12); setTimeout(()=>beep(880,.12),150); }
 function beepRest()  { beep(440, .25); }
-function beepCount() { beep(660, .1, .3); }
 function beepDone()  { beep(523,.15); setTimeout(()=>beep(659,.15),180); setTimeout(()=>beep(784,.4),360); }
+
+// ── Last-10s ticks — distinct per phase ──
+// Intro: soft hi-hat click (high, short, quiet)
+function tickIntro() { beep(2400, .04, .18); }
+// Work: sharp mid click (punchy, motivating)
+function tickWork()  { beep(1100, .06, .35); }
+// Rest: low soft thud (calm, slow feel)
+function tickRest()  { beep(280,  .12, .25); }
 
 // ── Adjusters ──
 function adj(key, delta) {
@@ -864,33 +873,61 @@ function updateTimerUI() {
   ppBtn.className = 'ctrl-btn primary' + (isWork ? '' : isIntro ? ' intro-phase' : ' rest-phase');
 }
 
-// ── Timer tick ──
+// ── Timer — wall-clock based, background-safe ──
+let S_phaseStart = 0;
+let S_phaseTotal = 0;
+
+function startPhase(seconds) {
+  S_phaseTotal = seconds;
+  S_phaseStart = Date.now();
+  S.remaining  = seconds;
+}
+
 function tick() {
-  if (S.paused) return;
-  S.remaining--;
+  if (S.paused || !S.running) return;
+  processTick();
+}
 
-  // Countdown beeps at 3,2,1
-  if (S.remaining <= 3 && S.remaining > 0) {
-    beepCount();
+function processTick() {
+  const elapsed = Math.floor((Date.now() - S_phaseStart) / 1000);
+  const newRemaining = Math.max(0, S_phaseTotal - elapsed);
+
+  if (newRemaining !== S.remaining) {
+    // Only fire sounds if time actually moved forward (not a skip-back)
+    if (newRemaining < S.remaining) {
+      const r = newRemaining;
+      // Last 10 seconds: play phase-specific tick every second
+      if (r > 0 && r <= 10) {
+        if (S.phase === 'intro')      tickIntro();
+        else if (S.phase === 'work')  tickWork();
+        else                          tickRest();
+      }
+    }
+    S.remaining = newRemaining;
+    updateTimerUI();
   }
-
-  updateTimerUI();
 
   if (S.remaining <= 0) {
     advancePhase();
   }
 }
 
+// When tab becomes visible again, immediately catch up
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && S.running && !S.paused) {
+    processTick();
+  }
+});
+
 function advancePhase() {
   if (S.phase === 'intro') {
-    // Intro done — start first work interval
     S.phase = 'work';
-    S.remaining = S.wm*60+S.ws;
+    startPhase(S.wm*60+S.ws);
     beepWork(); flashScreen('#ff3c3c');
   } else if (S.phase === 'work') {
     if (S.rm*60+S.rs > 0) {
       S.phase = 'rest';
-      S.remaining = S.rm*60+S.rs;
+      startPhase(S.rm*60+S.rs);
       beepRest(); flashScreen('#00e5a0');
     } else {
       nextRound(); return;
@@ -903,13 +940,12 @@ function advancePhase() {
 
 function nextRound() {
   if (S.currentRound >= S.rounds) {
-    // Done!
     finishWorkout();
     return;
   }
   S.currentRound++;
   S.phase = 'work';
-  S.remaining = S.wm*60+S.ws;
+  startPhase(S.wm*60+S.ws);
   beepWork(); flashScreen('#ff3c3c');
   updateTimerUI();
 }
@@ -934,23 +970,35 @@ function startWorkout() {
   document.getElementById('hdr-total').textContent = S.rounds;
   buildDots();
   showTimer();
-  updateTimerUI();
   if (S.phase === 'intro') {
+    startPhase(S.im*60+S.is);
     flashScreen('#ff8c00');
   } else {
+    startPhase(S.wm*60+S.ws);
     beepWork(); flashScreen('#ff3c3c');
   }
+  updateTimerUI();
   clearInterval(S.timer);
-  S.timer = setInterval(tick, 1000);
+  S.timer = setInterval(tick, 250); // poll 4x/sec for accuracy
 }
 
+let S_pausedAt = 0;
 function togglePause() {
   S.paused = !S.paused;
+  if (S.paused) {
+    S_pausedAt = Date.now();
+  } else {
+    // Shift phaseStart forward by the time we were paused
+    const pausedDuration = Date.now() - S_pausedAt;
+    S_phaseStart += pausedDuration;
+  }
   const btn = document.getElementById('pp-btn');
   btn.textContent = S.paused ? '▶ RESUME' : '⏸ PAUSE';
 }
 
 function skipPhase() {
+  // Jump to 1 second left in the current phase
+  S_phaseStart = Date.now() - (S_phaseTotal - 1) * 1000;
   S.remaining = 1;
 }
 
@@ -982,6 +1030,20 @@ function resetAll() {
   renderSetup();
   showSetup();
 }
+
+// ── Page Visibility — correct clock drift when app returns from background ──
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && S.running && !S.paused) {
+    // Recalculate remaining immediately when app comes back into view
+    const elapsed = Math.floor((Date.now() - S_phaseStart) / 1000);
+    S.remaining = Math.max(0, S_phaseTotal - elapsed);
+    if (S.remaining <= 0) {
+      advancePhase();
+    } else {
+      updateTimerUI();
+    }
+  }
+});
 
 // init
 renderSetup();
