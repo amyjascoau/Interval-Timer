@@ -741,12 +741,13 @@ function renderSetup() {
   document.getElementById('rs-disp').value = pad(S.rs);
   document.getElementById('rounds-disp').value = S.rounds;
   const w = S.wm*60+S.ws, r = S.rm*60+S.rs;
-  const total = (w+r)*S.rounds;
+  const restRounds = Math.max(0, S.rounds - 1);
   const intro = S.im*60+S.is;
+  const total = intro + w*S.rounds + r*restRounds;
   document.getElementById('sum-total').textContent = total > 0 ? fmtSec(total) : '—';
   document.getElementById('sum-intro').textContent = intro > 0 ? fmtSec(intro) : '—';
   document.getElementById('sum-work').textContent  = w*S.rounds > 0 ? fmtSec(w*S.rounds) : '—';
-  document.getElementById('sum-rest').textContent  = r*S.rounds > 0 ? fmtSec(r*S.rounds) : '—';
+  document.getElementById('sum-rest').textContent  = r*restRounds > 0 ? fmtSec(r*restRounds) : '—';
 }
 
 // Live input handlers (while typing)
@@ -779,11 +780,12 @@ function onBlurR(el) {
 }
 function updateSummary() {
   const w = S.wm*60+S.ws, r = S.rm*60+S.rs, intro = S.im*60+S.is;
-  const total = intro + (w+r)*S.rounds;
+  const restRounds = Math.max(0, S.rounds - 1);
+  const total = intro + w*S.rounds + r*restRounds;
   document.getElementById('sum-total').textContent = total > 0 ? fmtSec(total) : '—';
   document.getElementById('sum-intro').textContent = intro > 0 ? fmtSec(intro) : '—';
   document.getElementById('sum-work').textContent  = w*S.rounds > 0 ? fmtSec(w*S.rounds) : '—';
-  document.getElementById('sum-rest').textContent  = r*S.rounds > 0 ? fmtSec(r*S.rounds) : '—';
+  document.getElementById('sum-rest').textContent  = r*restRounds > 0 ? fmtSec(r*restRounds) : '—';
 }
 
 // ── Tabs ──
@@ -925,7 +927,8 @@ function advancePhase() {
     startPhase(S.wm*60+S.ws);
     beepWork(); flashScreen('#ff3c3c');
   } else if (S.phase === 'work') {
-    if (S.rm*60+S.rs > 0) {
+    const isLastRound = S.currentRound >= S.rounds;
+    if (S.rm*60+S.rs > 0 && !isLastRound) {
       S.phase = 'rest';
       startPhase(S.rm*60+S.rs);
       beepRest(); flashScreen('#00e5a0');
